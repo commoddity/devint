@@ -2,18 +2,18 @@ package llm
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/commoddity/devint/llm"
 	"github.com/commoddity/devint/llm/anthropic"
 	"github.com/commoddity/devint/llm/deepseek"
 	"github.com/commoddity/devint/llm/openai"
 	"github.com/commoddity/devint/llm/openrouter"
-	"github.com/pokt-network/poktroll/pkg/polylog"
 )
 
 // NewLLMProvider creates a new LLM provider based on the config.
 // It will validate the config only after any flags are applied.
-func NewLLMProvider(logger polylog.Logger, llmConfig *Config, flags ...ProviderFlag) (llm.LLMProvider, error) {
+func NewLLMProvider(logger *slog.Logger, llmConfig *Config, flags ...ProviderFlag) (llm.LLMProvider, error) {
 	for _, flag := range flags {
 		flag(llmConfig)
 	}

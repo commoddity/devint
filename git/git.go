@@ -29,9 +29,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"log/slog"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v69/github"
-	"github.com/pokt-network/poktroll/pkg/polylog"
 
 	gitCfg "github.com/commoddity/devint/config/git"
 )
@@ -49,13 +49,13 @@ var (
 // and a logger. It provides methods to create pull requests and to
 // interact with Git repositories.
 type Provider struct {
-	logger         polylog.Logger // Logger for logging operations.
-	*github.Client                // Embedded GitHub client for API calls.
+	logger         *slog.Logger // Logger for logging operations.
+	*github.Client             // Embedded GitHub client for API calls.
 }
 
 // NewGitProvider initializes and returns a new Git provider.
 // It validates the provided Git configuration and sets up an authenticated GitHub client.
-func NewGitProvider(logger polylog.Logger, cfg gitCfg.Config) (*Provider, error) {
+func NewGitProvider(logger *slog.Logger, cfg gitCfg.Config) (*Provider, error) {
 	// Validate the provided Git configuration.
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid git config: %w", err)
@@ -66,9 +66,9 @@ func NewGitProvider(logger polylog.Logger, cfg gitCfg.Config) (*Provider, error)
 	// If no token is provided, the client will be unauthenticated.
 	if cfg.PersonalAccessToken != "" {
 		client = github.NewClient(nil).WithAuthToken(cfg.PersonalAccessToken)
-		logger.Info().Msg("Performing Git operations with Authenticated GitHub Client")
+		logger.Info("🔐 Performing Git operations with Authenticated GitHub Client")
 	} else {
-		logger.Info().Msg("Performing Git operations with Unauthenticated GitHub Client")
+		logger.Info("⚠️  Performing Git operations with Unauthenticated GitHub Client")
 	}
 
 	// Create and return a new Provider with the authenticated GitHub client.
@@ -156,12 +156,12 @@ func (p *Provider) CreatePullRequest(ctx context.Context, repoOwner string, cfg 
 	// Create the pull request via GitHub's API.
 	pr, _, err := p.PullRequests.Create(ctx, repoOwner, repoName, newPR)
 	if err != nil {
-		p.logger.Error().Err(err).Msg("failed to create pull request")
+		p.logger.Error("❌ Failed to create pull request", "error", err)
 		return nil, fmt.Errorf("%s: %w\n%s", errPullRequestFailed, err, suggestConfiguringPAT)
 	}
 
 	// Log the URL of the created pull request.
-	p.logger.Info().Str("url", pr.GetHTMLURL()).Msg("created pull request")
+	p.logger.Info("✅ Created pull request", "url", pr.GetHTMLURL())
 	return pr, nil
 }
 
@@ -200,7 +200,7 @@ func (p *Provider) UpdatePullRequestBody(ctx context.Context, repoOwner string, 
 	}
 
 	// Log the URL of the updated pull request.
-	p.logger.Info().Str("url", pr.GetHTMLURL()).Msg("updated pull request")
+	p.logger.Info("✏️  Updated pull request", "url", pr.GetHTMLURL())
 	return pr, nil
 }
 
@@ -241,7 +241,7 @@ func (p *Provider) PushBranchToRemote(branchName string) error {
 	}
 
 	// Log success.
-	p.logger.Info().Msgf("Branch %s pushed to remote successfully", branchName)
+	p.logger.Info("📤 Branch pushed to remote successfully", "branch", branchName)
 	return nil
 }
 
@@ -274,7 +274,7 @@ func (p *Provider) GenerateDiff(ctx context.Context, targetBranch string) (strin
 
 	// Build the git diff command.
 	gitDiffCmd := fmt.Sprintf(gitDiffCmdTemplate, repoRoot, targetBranch)
-	p.logger.Info().Msgf("Executing git diff command ...")
+	p.logger.Info("🔍 Executing git diff command...", "target_branch", targetBranch)
 	gitDiffOutput, err := exec.Command("bash", "-c", gitDiffCmd).CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("failed to execute git diff command: %v\nOutput: %s", err, string(gitDiffOutput))
@@ -415,14 +415,14 @@ func (p *Provider) GetCommitsSinceBranchCreation(baseBranch string) ([]string, e
 			cmd = exec.Command("git", "merge-base", branch, currentBranch)
 			baseCommit, err = cmd.Output()
 			if err == nil {
-				p.logger.Info().Msgf("Detected %s as the base branch", branch)
+				p.logger.Info("🌿 Detected base branch", "branch", branch)
 				break
 			}
 		}
 
 		// If we couldn't find a common ancestor with standard branches, try to find the fork point
 		if err != nil {
-			p.logger.Info().Msg("Standard base branches not found, finding fork point...")
+			p.logger.Info("🔎 Standard base branches not found, finding fork point...")
 			cmd = exec.Command("git", "rev-parse", currentBranch)
 			currentCommit, err := cmd.Output()
 			if err != nil {
@@ -457,7 +457,7 @@ func (p *Provider) GetCommitsSinceBranchCreation(baseBranch string) ([]string, e
 
 	// If there are no commits, return an empty slice
 	if len(output) == 0 {
-		p.logger.Info().Msg("No commits found since branch creation")
+		p.logger.Info("ℹ️  No commits found since branch creation")
 		return []string{}, nil
 	}
 
@@ -470,6 +470,6 @@ func (p *Provider) GetCommitsSinceBranchCreation(baseBranch string) ([]string, e
 		result[i] = string(msg)
 	}
 
-	p.logger.Info().Msgf("Found %d commits since branch creation", len(result))
+	p.logger.Info("📝 Found commits since branch creation", "count", len(result))
 	return result, nil
 }

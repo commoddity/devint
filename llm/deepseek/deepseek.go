@@ -3,10 +3,10 @@ package deepseek
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	deepseek "github.com/cohesion-org/deepseek-go"
 	"github.com/cohesion-org/deepseek-go/constants"
-	"github.com/pokt-network/poktroll/pkg/polylog"
 
 	"github.com/commoddity/devint/llm"
 )
@@ -14,13 +14,13 @@ import (
 var _ llm.LLMProvider = &DeepseekProvider{}
 
 type DeepseekProvider struct {
-	logger      polylog.Logger
+	logger      *slog.Logger
 	client      *deepseek.Client
 	clientModel DeepSeekModel
 }
 
 type Config struct {
-	Logger      polylog.Logger
+	Logger      *slog.Logger
 	APIKey      string
 	ClientModel DeepSeekModel
 }
@@ -57,7 +57,7 @@ func (p *DeepseekProvider) SendPrompt(ctx context.Context, prompt string, flags 
 		},
 	}
 
-	p.logger.With("model", deepSeekModel).Info().Msg("Sending prompt to DeepSeek ...")
+	p.logger.Info("🤖 Sending prompt to DeepSeek...", "model", deepSeekModel)
 
 	resp, err := p.client.CreateChatCompletion(ctx, &req)
 	if err != nil {

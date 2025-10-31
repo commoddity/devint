@@ -3,8 +3,8 @@ package openai
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
-	"github.com/pokt-network/poktroll/pkg/polylog"
 	"github.com/sashabaranov/go-openai"
 
 	"github.com/commoddity/devint/llm"
@@ -13,13 +13,13 @@ import (
 var _ llm.LLMProvider = &OpenAIProvider{}
 
 type OpenAIProvider struct {
-	logger      polylog.Logger
+	logger      *slog.Logger
 	client      *openai.Client
 	clientModel OpenAIModel
 }
 
 type Config struct {
-	Logger      polylog.Logger
+	Logger      *slog.Logger
 	APIKey      string
 	ClientModel OpenAIModel
 }
@@ -56,7 +56,7 @@ func (p *OpenAIProvider) SendPrompt(ctx context.Context, prompt string, flags ..
 		},
 	}
 
-	p.logger.With("model", openaiModel).Info().Msg("Sending prompt to OpenAI ...")
+	p.logger.Info("🤖 Sending prompt to OpenAI...", "model", openaiModel)
 
 	resp, err := p.client.CreateChatCompletion(ctx, req)
 	if err != nil {

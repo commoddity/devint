@@ -16,7 +16,7 @@
 //   - Validates required flags (e.g. a non-empty PR title).
 //   - If in dummy mode, does not create the PR and copies the PR description to
 //     the clipboard instead.
-//   - Logs relevant information with a logger from the polyzero library.
+//   - Logs relevant information with structured JSON logging using slog.
 //   - Supports linking an issue number to the PR, and creating the PR as a draft if
 //     the title contains "DRAFT".
 // ---------------------------------------------------------------------------
@@ -26,10 +26,9 @@ package git
 import (
 	"context"
 	"fmt"
-	"log"
+	stdlog "log"
 	"strings"
 
-	"github.com/pokt-network/poktroll/pkg/polylog/polyzero"
 	"github.com/spf13/cobra"
 	"golang.design/x/clipboard"
 
@@ -37,6 +36,7 @@ import (
 	llmCfg "github.com/commoddity/devint/config/llm"
 	"github.com/commoddity/devint/git"
 	"github.com/commoddity/devint/llm"
+	"github.com/commoddity/devint/log"
 )
 
 // Git config flags
@@ -88,23 +88,23 @@ Flags:
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Initialize logger.
-		logger := polyzero.NewLogger()
+		logger := log.NewJSONLogger()
 
 		// Validate required flags.
 		if prTitle == "" && issue == 0 {
-			log.Fatalf("PR title or issue number is required")
+			stdlog.Fatalf("PR title or issue number is required")
 		}
 		if prTitle != "" && issue != 0 {
-			log.Fatalf("PR title and issue number cannot both be provided")
+			stdlog.Fatalf("PR title and issue number cannot both be provided")
 		}
 		if updatePRNumber != 0 && issue != 0 {
-			log.Fatalf("Update PR number and issue number cannot both be provided")
+			stdlog.Fatalf("Update PR number and issue number cannot both be provided")
 		}
 
 		// Load configuration from the config YAML file.
 		cfg, err := config.LoadConfig()
 		if err != nil {
-			log.Fatalf("failed to load config: %v", err)
+			stdlog.Fatalf("failed to load config: %v", err)
 		}
 
 		// Determine repo owner: flag override > config > error if neither
@@ -113,13 +113,13 @@ Flags:
 			repoOwner = cfg.Git.RepoOwner
 		}
 		if repoOwner == "" {
-			log.Fatalf("repo owner is required. Either set repo_owner in git_config (using 'devint config') or provide --repo-owner flag")
+			stdlog.Fatalf("repo owner is required. Either set repo_owner in git_config (using 'devint config') or provide --repo-owner flag")
 		}
 
 		// Initialize the Git provider using loaded Git config.
 		gitProvider, err := git.NewGitProvider(logger, *cfg.Git)
 		if err != nil {
-			log.Fatalf("failed to create git provider: %v", err)
+			stdlog.Fatalf("failed to create git provider: %v", err)
 		}
 
 		// Get additional provider flags based on any overrides set.
@@ -127,13 +127,13 @@ Flags:
 		// Initialize the LLM provider with potential provider overrides.
 		llmProvider, err := llmCfg.NewLLMProvider(logger, cfg.LLMs, providerFlags...)
 		if err != nil {
-			log.Fatalf("failed to get LLM provider: %v", err)
+			stdlog.Fatalf("failed to get LLM provider: %v", err)
 		}
 
 		// Retrieve the current branch name.
 		currentBranch, err := gitProvider.GetCurrentBranchName()
 		if err != nil {
-			log.Fatalf("failed to get current branch name: %v", err)
+			stdlog.Fatalf("failed to get current branch name: %v", err)
 		}
 
 		logger = logger.With(
@@ -147,7 +147,7 @@ Flags:
 		if updatePRNumber != 0 {
 			targetBranch, err = gitProvider.GetPRTargetBranch(context.Background(), repoOwner, updatePRNumber)
 			if err != nil {
-				log.Fatalf("failed to get PR target branch: %v", err)
+				stdlog.Fatalf("failed to get PR target branch: %v", err)
 			}
 			logger = logger.With(
 				"target_branch", targetBranch,
@@ -155,18 +155,18 @@ Flags:
 			)
 		}
 
-		logger.Info().Msg("Initialization successful. Running command...")
+		logger.Info("✅ Initialization successful. Running command...")
 
 		// Generate a diff from Git against the target branch.
 		diff, err := gitProvider.GenerateDiff(context.Background(), targetBranch)
 		if err != nil {
-			log.Fatalf("failed to generate diff: %v", err)
+			stdlog.Fatalf("failed to generate diff: %v", err)
 		}
 
 		// Get the commits on the current branch.
 		branchCommits, err := gitProvider.GetCommitsSinceBranchCreation(targetBranch)
 		if err != nil {
-			log.Fatalf("failed to get branch commits: %v", err)
+			stdlog.Fatalf("failed to get branch commits: %v", err)
 		}
 		branchCommitsStr := strings.Join(branchCommits, "\n")
 
@@ -178,13 +178,13 @@ Flags:
 		// Send the prompt to the LLM provider.
 		prDescription, err := llmProvider.SendPrompt(context.Background(), prompt, promptFlags...)
 		if err != nil {
-			log.Fatalf("failed to send prompt: %v", err)
+			stdlog.Fatalf("failed to send prompt: %v", err)
 		}
 
 		// --- NEW CODE: Check for TODOs in the diff and append them to the PR description ---
 		todoInThisPR, otherTODOs, err := checkForTODOs(diff)
 		if err != nil {
-			log.Printf("failed to check for TODOs: %v", err)
+			stdlog.Printf("failed to check for TODOs: %v", err)
 		}
 		if len(todoInThisPR) > 0 {
 			todoSection := fmt.Sprintf(todoInThisPRTemplate, strings.Join(todoInThisPR, "\n"))
@@ -204,11 +204,11 @@ Flags:
 		if dummy {
 			err := clipboard.Init()
 			if err != nil {
-				log.Fatalf("failed to initialize clipboard: %v", err)
+				stdlog.Fatalf("failed to initialize clipboard: %v", err)
 			}
 			fmt.Printf("PR Description:\n\n%s\n", prDescription)
 			clipboard.Write(clipboard.FmtText, []byte(prDescription))
-			logger.Info().Msg("PR description copied to clipboard. PR not created.")
+			logger.Info("📋 PR description copied to clipboard. PR not created.")
 			return
 		}
 
@@ -216,7 +216,7 @@ Flags:
 		if updatePRNumber != 0 {
 			pullRequest, err := gitProvider.UpdatePullRequestBody(context.Background(), repoOwner, updatePRNumber, prTitle, prDescription)
 			if err != nil {
-				log.Fatalf("failed to update pull request: %v", err)
+				stdlog.Fatalf("failed to update pull request: %v", err)
 			}
 			fmt.Printf("✅ Pull request # %d updated Successfully!\n🌿 Pull Request URL: %s\n", *pullRequest.Number, *pullRequest.HTMLURL)
 			return
@@ -237,7 +237,7 @@ Flags:
 		// Create the pull request using the Git provider.
 		pullRequest, err := gitProvider.CreatePullRequest(context.Background(), repoOwner, pullRequestConfig)
 		if err != nil {
-			log.Fatalf("failed to create pull request: %v", err)
+			stdlog.Fatalf("failed to create pull request: %v", err)
 		}
 
 		fmt.Printf("✅ Pull request # %d created Successfully!\n🌿 Pull Request URL: %s\n", *pullRequest.Number, *pullRequest.HTMLURL)

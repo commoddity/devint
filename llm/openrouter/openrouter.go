@@ -3,8 +3,8 @@ package openrouter
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
-	"github.com/pokt-network/poktroll/pkg/polylog"
 	openrouter "github.com/revrost/go-openrouter"
 
 	"github.com/commoddity/devint/llm"
@@ -13,13 +13,13 @@ import (
 var _ llm.LLMProvider = &OpenRouterProvider{}
 
 type OpenRouterProvider struct {
-	logger      polylog.Logger
+	logger      *slog.Logger
 	client      *openrouter.Client
 	clientModel OpenRouterModel
 }
 
 type Config struct {
-	Logger      polylog.Logger
+	Logger      *slog.Logger
 	APIKey      string
 	ClientModel OpenRouterModel
 }
@@ -58,7 +58,7 @@ func (p *OpenRouterProvider) SendPrompt(ctx context.Context, prompt string, flag
 		},
 	}
 
-	p.logger.With("model", openrouterModel).Info().Msg("Sending prompt to OpenRouter ...")
+	p.logger.Info("🤖 Sending prompt to OpenRouter...", "model", openrouterModel)
 
 	resp, err := p.client.CreateChatCompletion(ctx, req)
 	if err != nil {

@@ -3,9 +3,9 @@ package anthropic
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	anthropicapi "github.com/liushuangls/go-anthropic/v2"
-	"github.com/pokt-network/poktroll/pkg/polylog"
 
 	"github.com/commoddity/devint/llm"
 )
@@ -13,13 +13,13 @@ import (
 var _ llm.LLMProvider = &AnthropicProvider{}
 
 type AnthropicProvider struct {
-	logger      polylog.Logger
+	logger      *slog.Logger
 	client      *anthropicapi.Client
 	clientModel AnthropicModel
 }
 
 type Config struct {
-	Logger      polylog.Logger
+	Logger      *slog.Logger
 	APIKey      string
 	ClientModel AnthropicModel
 }
@@ -54,7 +54,7 @@ func (p *AnthropicProvider) SendPrompt(ctx context.Context, prompt string, flags
 		},
 	}
 
-	p.logger.With("model", anthropicModel).Info().Msg("Sending prompt to Anthropic ...")
+	p.logger.Info("🤖 Sending prompt to Anthropic...", "model", anthropicModel)
 
 	resp, err := p.client.CreateMessages(ctx, req)
 	if err != nil {
