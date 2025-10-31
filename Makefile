@@ -2,7 +2,7 @@
 release-patch:
 	git add .
 	$(eval NEW_VERSION=$(shell git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$$NF++;} 1'))
-	git commit --no-verify -m "patch release $(NEW_VERSION)"
+	git commit --no-verify --allow-empty -m "patch release $(NEW_VERSION)"
 	git push origin main
 	git tag $(NEW_VERSION)
 	git push origin $(NEW_VERSION)
@@ -12,7 +12,7 @@ release-patch:
 release-minor:
 	git add .
 	$(eval NEW_VERSION=$(shell git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$$2++; $$NF=0} 1'))
-	git commit --no-verify -m "minor release $(NEW_VERSION)"
+	git commit --no-verify --allow-empty -m "minor release $(NEW_VERSION)"
 	git push origin main
 	git tag $(NEW_VERSION)
 	git push origin $(NEW_VERSION)
