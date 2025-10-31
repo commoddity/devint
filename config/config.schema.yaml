@@ -1,0 +1,128 @@
+description: "Developer Interface Configuration YAML: this file is used to configure the Developer Interface."
+type: object
+required:
+  - git_config
+  - llm_config
+additionalProperties: false
+properties:
+  git_config:
+    description: "Git configuration. This is used to configure your Git client for creating and pushing commits."
+    type: object
+    required:
+      - personal_access_token
+      - repo_owner
+    additionalProperties: false
+    properties:
+      personal_access_token:
+        description: "Valid Personal Access Token for GitHub. Should have at least `write` scope for `repo`."
+        type: string
+        pattern: "^(ghp_|gho_|ghu_|ghs_|ghr_|github_pat_)[a-zA-Z0-9_]{36,}$"
+      repo_owner:
+        description: "GitHub repository owner (organization or username) for pull request operations."
+        type: string
+  llm_config:
+    description: "LLM configuration. This is used to configure your LLM providers."
+    type: object
+    required:
+      - default_llm_provider
+      - llm_providers
+    additionalProperties: false
+    properties:
+      default_llm_provider:
+        description: "The default LLM provider to use. This may be overriden per-request using the `-p|--provider` flag."
+        type: string
+        enum:
+          - "openai"
+          - "deepseek"
+          - "anthropic"
+          - "openrouter"
+      llm_providers:
+        description: "LLM providers configuration. This is used to configure your LLM providers."
+        type: object
+        anyOf:
+          - required: ["openai"]
+          - required: ["deepseek"]
+          - required: ["anthropic"]
+          - required: ["openrouter"]
+        additionalProperties: false
+        properties:
+          openai:
+            description: "OpenAI configuration."
+            type: object
+            required:
+              - api_key
+              - client_model
+            additionalProperties: false
+            properties:
+              api_key:
+                description: "API key for OpenAI."
+                type: string
+              client_model:
+                description: "Client model for OpenAI. This may be overriden per-request using the `-m|--model` flag."
+                type: string
+                enum:
+                  - "o1-mini"
+                  - "o1"
+                  - "o3-mini"
+                  - "gpt-4o"
+          deepseek:
+            description: "DeepSeek configuration."
+            type: object
+            required:
+              - api_key
+              - client_model
+            additionalProperties: false
+            properties:
+              api_key:
+                description: "API key for DeepSeek."
+                type: string
+              client_model:
+                description: "Client model for DeepSeek. This may be overriden per-request using the `-m|--model` flag."
+                type: string
+                enum:
+                  - "deepseek-chat"
+                  - "deepseek-chat"
+                  - "deepseek-reasoner"
+          anthropic:
+            description: "Anthropic configuration."
+            type: object
+            required:
+              - api_key
+              - client_model
+            additionalProperties: false
+            properties:
+              api_key:
+                description: "API key for Anthropic."
+                type: string
+              client_model:
+                description: "Client model for Anthropic. This may be overriden per-request using the `-m|--model` flag."
+                type: string
+                enum:
+                  - "claude-3-5-haiku-latest"
+                  - "claude-3-5-sonnet-latest"
+                  - "claude-3-opus-20240229"
+          openrouter:
+            description: "OpenRouter configuration."
+            type: object
+            required:
+              - api_key
+              - client_model
+            additionalProperties: false
+            properties:
+              api_key:
+                description: "API key for OpenRouter."
+                type: string
+              client_model:
+                description: "Client model for OpenRouter. This may be overriden per-request using the `-m|--model` flag."
+                type: string
+                enum:
+                  - "deepseek/deepseek-chat-v3-0324"
+                  - "deepseek/deepseek-chat"
+                  - "deepseek/deepseek-r1"
+                  - "perplexity/r1-1776"
+                  - "openai/chatgpt-4o-latest"
+                  - "openai/o1"
+                  - "anthropic/claude-3.7-sonnet"
+                  - "anthropic/claude-3.5-haiku"
+                  - "anthropic/claude-3-opus"
+                  - "qwen/qwen-turbo"

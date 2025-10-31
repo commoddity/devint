@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=../config.schema.yaml
+git_config:
+  personal_access_token: github_pat_1a2b3c4d5e6f7g8h9i0j1a2b3c4d5e6f7g8h9i0j
+  repo_owner: your-github-org-or-username
+llm_config:
+  default_llm_provider: openai
+  llm_providers:
+    openai:
+      api_key: "your-openai-api-key"
+      client_model: "gpt-4o"
+    deepseek:
+      api_key: "your-deepseek-api-key"
+      client_model: "deepseek-chat"
+    anthropic:
+      api_key: "your-anthropic-api-key"
+      client_model: "claude-3-5-haiku-latest"
+    openrouter:
+      api_key: "your-openrouter-api-key"
+      client_model: "deepseek/deepseek-chat"
