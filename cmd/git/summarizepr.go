@@ -166,6 +166,7 @@ Please analyze the following pull request and generate a brief, concise summary 
 
 - Keep the summary brief and easily readable.
 - When explaining code changes, include the code being explained in a block above the explanation.
+- Start the summary with a bullet point list of changed files and models (if any).
 
 PR Information:
 - Title: %s
