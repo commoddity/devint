@@ -156,6 +156,7 @@ Flags:
 // It guides the LLM to explain the rationale and Django/Python best practices in a concise format.
 const summaryPromptTemplate = `You are helping a senior level engineer learn about a pull request.
 The engineer is familiar with Go and Typescript but is relatively new to Python and Django.
+Perform summarization of the pull request and examine it for typical PR review improvements and suggestions.
 
 Please analyze the following pull request and generate a brief, concise summary (2-4 paragraphs max) that:
 1. Explains the rationale behind the changes - why were these modifications made?
@@ -166,7 +167,8 @@ Please analyze the following pull request and generate a brief, concise summary 
 
 - Keep the summary brief and easily readable.
 - When explaining code changes, include the code being explained in a block above the explanation.
-- Start the summary with a bullet point list of changed files and models (if any).
+- Start the summary with a bullet point list of allchanged files and models (if any).
+- Act as a senior level engineer reviewing the PR and provide feedback on the changes.
 
 PR Information:
 - Title: %s
