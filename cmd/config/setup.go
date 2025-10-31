@@ -110,6 +110,16 @@ func RunFirstTimeSetup() error {
 	}
 	gitConfigNode.Content = cfgEditor.SetScalarValue(gitConfigNode.Content, "repo_owner", repoOwner)
 
+	// Configure pr_summary_output_dir (optional)
+	fmt.Print(log.Green + "📁 Optionally, enter a directory path where PR summaries will be saved. (Leave empty to skip)" + log.ResetColor + "\n")
+	fmt.Print(log.Blue + "📝 Enter PR summary output directory (optional, press Enter to skip): " + log.ResetColor)
+	prSummaryDir, _ := reader.ReadString('\n')
+	prSummaryDir = strings.TrimSpace(prSummaryDir)
+	cfgEditor.ClearTerminal()
+	if prSummaryDir != "" {
+		gitConfigNode.Content = cfgEditor.SetScalarValue(gitConfigNode.Content, "pr_summary_output_dir", prSummaryDir)
+	}
+
 	llmConfigNode := cfgEditor.GetOrCreateMappingNode(configNode, "llm_config")
 	allowedProviders := yamlEditor.GetEnumOptionsForPath("llm_config.default_llm_provider")
 	if len(allowedProviders) == 0 {

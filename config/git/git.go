@@ -18,6 +18,8 @@ type Config struct {
 	PersonalAccessToken string `yaml:"personal_access_token"`
 	// GitHub repository owner (organization or username) for pull request operations.
 	RepoOwner string `yaml:"repo_owner"`
+	// Optional directory path where PR summaries will be saved. If not set, summaries are not saved to disk.
+	PRSummaryOutputDir string `yaml:"pr_summary_output_dir"`
 }
 
 func (c *Config) Validate() error {

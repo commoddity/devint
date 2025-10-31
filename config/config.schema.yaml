@@ -20,6 +20,9 @@ properties:
       repo_owner:
         description: "GitHub repository owner (organization or username) for pull request operations."
         type: string
+      pr_summary_output_dir:
+        description: "Optional directory path where PR summaries will be saved. If not set, summaries are not saved to disk."
+        type: string
   llm_config:
     description: "LLM configuration. This is used to configure your LLM providers."
     type: object
