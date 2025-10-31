@@ -9,7 +9,6 @@ var tokenPattern = regexp.MustCompile(`^(ghp_|gho_|ghu_|ghs_|ghr_|github_pat_)[a
 
 var (
 	errGitConfigMissing           = errors.New("config error: git config is missing")
-	errPersonalAccessTokenMissing = errors.New("config error: personal access token is missing")
 	errInvalidPersonalAccessToken = errors.New("config error: personal access token is invalid")
 )
 
@@ -25,10 +24,8 @@ func (c *Config) Validate() error {
 	if c == nil {
 		return errGitConfigMissing
 	}
-	if c.PersonalAccessToken == "" {
-		return errPersonalAccessTokenMissing
-	}
-	if !tokenPattern.MatchString(c.PersonalAccessToken) {
+	// PersonalAccessToken is now optional - we can fall back to gh auth token
+	if c.PersonalAccessToken != "" && !tokenPattern.MatchString(c.PersonalAccessToken) {
 		return errInvalidPersonalAccessToken
 	}
 	return nil

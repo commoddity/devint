@@ -28,8 +28,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"log/slog"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v69/github"
 
@@ -40,7 +42,7 @@ import (
 
 var (
 	// Suggest configuring a valid Personal Access Token for GitHub if attempting to perform operations on a private repository.
-	suggestConfiguringPAT = "If the failure is due to a missing or invalid Personal Access Token, configure a valid Personal Access Token for GitHub in your config file.\nYou may do so by running `devint config`."
+	suggestConfiguringPAT = "If the failure is due to a missing or invalid authentication, ensure you are logged in with `gh auth login` or configure a valid Personal Access Token in your config file.\nYou may configure a token by running `devint config`."
 
 	errPullRequestFailed = errors.New("git error: pull request failed")
 )
@@ -50,26 +52,56 @@ var (
 // interact with Git repositories.
 type Provider struct {
 	logger         *slog.Logger // Logger for logging operations.
-	*github.Client             // Embedded GitHub client for API calls.
+	*github.Client              // Embedded GitHub client for API calls.
+}
+
+// getGitHubToken retrieves a GitHub authentication token from config or gh CLI.
+// It tries in order: 1) config PersonalAccessToken, 2) gh auth token.
+func getGitHubToken(cfg gitCfg.Config) (string, error) {
+	// First, try the configured token
+	if cfg.PersonalAccessToken != "" {
+		return cfg.PersonalAccessToken, nil
+	}
+
+	// Fall back to gh CLI authentication
+	cmd := exec.Command("gh", "auth", "token")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("no personal access token in config and gh CLI not authenticated: %w", err)
+	}
+
+	token := strings.TrimSpace(string(output))
+	if token == "" {
+		return "", fmt.Errorf("no personal access token in config and gh CLI returned empty token")
+	}
+
+	return token, nil
 }
 
 // NewGitProvider initializes and returns a new Git provider.
 // It validates the provided Git configuration and sets up an authenticated GitHub client.
+// If no PersonalAccessToken is provided in config, it will attempt to use `gh auth token`.
 func NewGitProvider(logger *slog.Logger, cfg gitCfg.Config) (*Provider, error) {
 	// Validate the provided Git configuration.
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid git config: %w", err)
 	}
 
-	client := github.NewClient(nil)
-	// Valid  Personal Access Token is required if performing actions on a private repository.
-	// If no token is provided, the client will be unauthenticated.
-	if cfg.PersonalAccessToken != "" {
-		client = github.NewClient(nil).WithAuthToken(cfg.PersonalAccessToken)
-		logger.Info("🔐 Performing Git operations with Authenticated GitHub Client")
-	} else {
-		logger.Info("⚠️  Performing Git operations with Unauthenticated GitHub Client")
+	// Get authentication token from config or gh CLI
+	token, err := getGitHubToken(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get GitHub authentication token: %w", err)
 	}
+
+	// Create authenticated GitHub client
+	client := github.NewClient(nil).WithAuthToken(token)
+
+	// Determine token source for logging
+	tokenSource := "config"
+	if cfg.PersonalAccessToken == "" {
+		tokenSource = "gh-cli"
+	}
+	logger.Info("🔐 Performing Git operations with Authenticated GitHub Client", "source", tokenSource)
 
 	// Create and return a new Provider with the authenticated GitHub client.
 	return &Provider{
