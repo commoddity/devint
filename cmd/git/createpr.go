@@ -176,13 +176,10 @@ Flags:
 		// Get prompt flags based on any model override.
 		promptFlags := getPromptFlags()
 		// Send the prompt to the LLM provider.
-		response, err := llmProvider.SendPrompt(context.Background(), prompt, promptFlags...)
+		prDescription, err := llmProvider.SendPrompt(context.Background(), prompt, promptFlags...)
 		if err != nil {
 			log.Fatalf("failed to send prompt: %v", err)
 		}
-
-		// Build the final PR description by adding a sanity checklist.
-		prDescription := buildPRDescription(response)
 
 		// --- NEW CODE: Check for TODOs in the diff and append them to the PR description ---
 		todoInThisPR, otherTODOs, err := checkForTODOs(diff)
@@ -286,12 +283,6 @@ func buildPrompt(prTitle, diff, branchCommits string) string {
 func isDraft(prTitle string) bool {
 	return strings.Contains(strings.ToUpper(prTitle), "DRAFT") ||
 		strings.Contains(strings.ToUpper(prTitle), "WIP")
-}
-
-// buildPRDescription builds the final PR description from the LLM response.
-// It adds a sanity checklist to the generated description.
-func buildPRDescription(summary string) string {
-	return fmt.Sprintf(prDescription, summary)
 }
 
 /*--------- TODOs ---------*/
@@ -411,36 +402,14 @@ const promptIntro = `Please generate a GitHub PR description from the following 
 		Considerations:
 		- Keep the bullet points concise
 		- Escape key terms with backticks
-		- Primary changes are what the PR is all about
-		- Secondary changes include misc changes (e.g. documentation updates, etc)
+		- Primary changes are the functional changes that are the main focus of the PR
+		- Secondary changes include meta or miscellaneous changes (e.g. documentation updates, code cleanup, etc)
 		- Limit the number of bullets to 3-5
 		- Do not include backticks or markdown formatting in the output
 
 		Diff:
 
 		%s`
-
-// prDescription defines the final PR description template, including a sanity checklist.
-const prDescription = `%s
-
-## 🛠️ Type of change
-
-Select one or more from the following:
-
-- [ ] New feature, functionality or library
-- [ ] Bug fix
-- [ ] Code health or cleanup
-- [ ] Documentation
-- [ ] Other (specify)
-
-## 🤯 Sanity Checklist
-
-- [ ] I have updated the GitHub Issue 'assignees', 'reviewers', 'labels', 'project', 'iteration' and 'milestone'
-- [ ] For docs, I have run 'make docusaurus_start'
-- [ ] For code, I have run 'make test_all'
-- [ ] For configurations, I have update the documentation
-- [ ] I added TODOs where applicable
-`
 
 const todoInThisPRTemplate = `
 ## 🚨 TODO_IN_THIS_PR 
