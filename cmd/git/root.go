@@ -47,4 +47,6 @@ If no subcommand is provided, the command will display its help information.`,
 func init() {
 	// Add the createpr subcommand to the main git command.
 	GitCmd.AddCommand(createprCmd)
+	// Add the summarizepr subcommand to the main git command.
+	GitCmd.AddCommand(summarizeprCmd)
 }

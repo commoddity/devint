@@ -3,6 +3,7 @@ git_config:
   personal_access_token: github_pat_1a2b3c4d5e6f7g8h9i0j1a2b3c4d5e6f7g8h9i0j
   repo_owner: your-github-org-or-username
   # pr_summary_output_dir: /path/to/output/directory  # Optional: directory where PR summaries will be saved
+  # company_name: yourcompany  # Optional: company name to filter from diffs (matched case-insensitively)
 llm_config:
   default_llm_provider: openai
   llm_providers:

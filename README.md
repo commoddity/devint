@@ -10,6 +10,7 @@
 - [Usage](#usage)
   - [devint](#devint)
   - [devint git createpr](#devint-git-createpr)
+  - [devint git summarizepr](#devint-git-summarizepr)
   - [devint config](#devint-config)
 - [Configuration](#configuration)
 
@@ -41,6 +42,17 @@ The Developer Interface (DI) enables streamlined development workflows by provid
 | --dummy (-d)             | bool   | ❌        | Dummy mode. Will print summary to console and clipboard but not open a PR on GitHub |
 | --provider-override (-p) | string | ❌        | LLM provider override. Sets the LLM provider only for this request                  |
 | --model-override (-m)    | string | ❌        | LLM model override. Sets the LLM model only for this request                        |
+
+### devint git summarizepr
+
+| Flag              | Type   | Required | Description                                                                    |
+| ----------------- | ------ | -------- | ------------------------------------------------------------------------------ |
+| --pr-number (-p)  | int    | ✅        | Pull request number to summarize                                               |
+| --repo-owner (-r) | string | ❌        | GitHub repository owner override. If set, overrides the repo_owner from config |
+
+This command fetches a pull request by number, retrieves its diff, and saves a formatted markdown summary to the directory specified by `pr_summary_output_dir` in your config file. The summary includes PR metadata (title, number, status, author, URL), description, and formatted diff.
+
+**Note:** The `pr_summary_output_dir` must be set in your `git_config` (via `devint config`) for this command to work.
 
 ### devint config
 

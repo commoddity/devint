@@ -23,6 +23,9 @@ properties:
       pr_summary_output_dir:
         description: "Optional directory path where PR summaries will be saved. If not set, summaries are not saved to disk."
         type: string
+      company_name:
+        description: "Company/organization name to filter from diffs sent to LLMs. This will be matched case-insensitively and removed from diffs before sending to LLM services. If not set, no company name filtering is performed."
+        type: string
   llm_config:
     description: "LLM configuration. This is used to configure your LLM providers."
     type: object

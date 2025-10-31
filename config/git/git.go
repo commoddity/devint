@@ -20,6 +20,8 @@ type Config struct {
 	RepoOwner string `yaml:"repo_owner"`
 	// Optional directory path where PR summaries will be saved. If not set, summaries are not saved to disk.
 	PRSummaryOutputDir string `yaml:"pr_summary_output_dir"`
+	// Company name to filter from diffs sent to LLMs. Used for sanitization (case-insensitive matching).
+	CompanyName string `yaml:"company_name"`
 }
 
 func (c *Config) Validate() error {
