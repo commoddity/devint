@@ -160,9 +160,12 @@ The engineer is familiar with Go and Typescript but is relatively new to Python 
 Please analyze the following pull request and generate a brief, concise summary (2-4 paragraphs max) that:
 1. Explains the rationale behind the changes - why were these modifications made?
 2. Highlights key Django and Python best practices demonstrated
-3. Points out notable improvements or optimizations
+3. Points out notable improvements or optimizations.
+4. Points out potential pitfalls or gotchas.
+5. Looks for any obvious bugs or runtime errors that may be introduced by the changes.
 
-Keep it brief and focused. Avoid long explanations but do reference and explain key code changes in code changes where you think it would be valuable to the engineer.
+- Keep the summary brief and easily readable.
+- When explaining code changes, include the code being explained in a block above the explanation.
 
 PR Information:
 - Title: %s
@@ -170,9 +173,7 @@ PR Information:
 
 Diff:
 
-%s
-
-Generate a concise, educational summary that will help someone learning Python and Django understand not just what changed, but why it changed and how it follows best practices.`
+%s`
 
 // buildSummaryPrompt constructs the LLM prompt with PR details and diff.
 func buildSummaryPrompt(pr *github.PullRequest, diff string) string {
