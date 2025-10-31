@@ -372,16 +372,16 @@ const promptIntro = `Please generate a GitHub PR description from the following 
 
 		--- BEGIN PR TEMPLATE (do not include this line in the output) ---
 
-		## 🌿 Summary
+		## 💡 Summary
 
 		< One line summary >
 
-		### 🌱 Primary Changes:
+		### 🛠️ Primary Changes:
 		- < core changes # 1 >
 		- < core changes # 2 >
 		- ...
 
-		### 🍃 Secondary changes:
+		### 🧹 Secondary changes:
 		- < secondary changes # 1 >
 		- < secondary changes # 2 >
 		- ...
