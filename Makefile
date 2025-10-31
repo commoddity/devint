@@ -1,7 +1,8 @@
 .PHONY: release-patch
 release-patch:
 	git add .
-	$(eval NEW_VERSION=$(shell git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$$NF++;} 1'))
+	$(eval CURRENT_VERSION=$(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"))
+	$(eval NEW_VERSION=$(shell echo $(CURRENT_VERSION) | awk -F. -v OFS=. '{$$NF++;} 1'))
 	git commit --no-verify --allow-empty -m "patch release $(NEW_VERSION)"
 	git push origin main
 	git tag $(NEW_VERSION)
@@ -11,7 +12,8 @@ release-patch:
 .PHONY: release-minor
 release-minor:
 	git add .
-	$(eval NEW_VERSION=$(shell git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$$2++; $$NF=0} 1'))
+	$(eval CURRENT_VERSION=$(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"))
+	$(eval NEW_VERSION=$(shell echo $(CURRENT_VERSION) | awk -F. -v OFS=. '{$$2++; $$NF=0} 1'))
 	git commit --no-verify --allow-empty -m "minor release $(NEW_VERSION)"
 	git push origin main
 	git tag $(NEW_VERSION)
