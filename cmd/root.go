@@ -25,6 +25,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/commoddity/devint/cmd/chat"
 	"github.com/commoddity/devint/cmd/config"
 	"github.com/commoddity/devint/cmd/git"
 )
@@ -97,7 +98,7 @@ func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Toggle verbose mode or other options")
 	rootCmd.AddCommand(git.GitCmd)
 	rootCmd.AddCommand(config.ConfigCmd)
-	rootCmd.AddCommand(chatCmd)
+	rootCmd.AddCommand(chat.ChatCmd)
 
 	if !config.ConfigExists() {
 		config.RunFirstTimeSetup()
