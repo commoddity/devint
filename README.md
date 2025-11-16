@@ -61,11 +61,11 @@ For API documentation, see [thaura.ai/api-platform](https://thaura.ai/api-platfo
 
 
 > ## 🇵🇸 Tech for Palestine <!-- omit in toc -->
-> [Tech for Palestine](https://techforpalestine.org/) (T4P) is a coalition of thousands of founders, engineers, product marketers, investors, and other professionals working in support of Palestinian liberation.
+> [Tech for Palestine](https://techforpalestine.org/) (T4P) is a coalition of founders, engineers, product marketers, investors, and other professionals working in support of Palestinian liberation.
 >
 >**What is Tech for Palestine?**
 >
->Tech for Palestine is first and foremost an incubator for advocacy projects. They rally thousands of volunteers from across the tech world — founders, engineers, marketers, investors, and more — all committed to Palestinian liberation.
+>Tech for Palestine is first and foremost an incubator for advocacy projects. They rally volunteers from across the tech world — founders, engineers, marketers, investors, and more — all committed to Palestinian liberation.
 >
 >The T4P Incubator helps pro-Palestine advocates build, grow, and scale their work towards a Free Palestine. They support projects — whether collections of individuals, registered non-profits, or even companies — whose mission helps Palestine, especially advocacy groups building technical products or in the tech space.
 >
