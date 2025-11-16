@@ -39,7 +39,7 @@ Developer toolkit powered by multi-provider LLM integration.
 - [Interactive Chat](#interactive-chat)
   - [One-Shot Mode](#one-shot-mode)
   - [Interactive Mode](#interactive-mode)
-- [Usage](#usage)
+- [Commands Usage](#commands-usage)
 - [Configuration](#configuration)
 - [TODOs](#todos)
 
@@ -54,16 +54,17 @@ Key features include:
 - 🔧 **Git Integration**: Automated PR creation and summarization powered by AI
 - ⚙️ **Flexible Configuration**: Easy-to-use YAML-based configuration system
 - 🎯 **Developer-Focused**: Built for developers who want to automate routine tasks
+- 💬 **Live Chat**: Interact with AI models in real-time from your terminal
 
 # Providers
 
-`devint` supports multiple LLM providers, each offering unique capabilities and models. You can configure one or more providers and switch between them as needed.
+`devint` supports multiple LLM providers. You can configure one or more providers and switch between them as needed.
 
-| Provider         | Website                                | Description                                         | Models                                                                      |
-| ---------------- | -------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
-| 🇵🇸 **Thaura**     | [thaura.ai](https://thaura.ai)         | AI platform supporting Palestinian liberation       | `thaura`                                                                    |
-| 🤖 **DeepSeek**   | [deepseek.com](https://deepseek.com)   | High-performance AI models for coding and reasoning | `deepseek-chat`, `deepseek-reasoner`                                        |
-| 🌐 **OpenRouter** | [openrouter.ai](https://openrouter.ai) | Unified API for accessing multiple AI models        | Any model string (see [openrouter.ai/models](https://openrouter.ai/models)) |
+| Provider              | Website                                | Description                                         | Models                                                   |
+| --------------------- | -------------------------------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| 🇵🇸&nbsp;**Thaura**     | [thaura.ai](https://thaura.ai)         | Ethical AI platform from Tech for Palestine         | `thaura`                                                 |
+| 🇨🇳&nbsp;**DeepSeek**   | [deepseek.com](https://deepseek.com)   | High-performance AI models for coding and reasoning | `deepseek-chat`, `deepseek-reasoner`                     |
+| 🌍&nbsp;**OpenRouter** | [openrouter.ai](https://openrouter.ai) | Unified API for accessing AI models                 | See [openrouter.ai/models](https://openrouter.ai/models) |
 
 ## Thaura 
 
@@ -139,24 +140,18 @@ The `devint chat` command provides a powerful interface for interacting with you
   <p><i>One-shot mode with streaming response</i></p>
 </div>
 
-Send a single prompt and receive a response directly in your terminal. For streaming providers (like Thaura), responses appear in real-time as they're generated. For non-streaming providers, a spinner animation indicates progress.
+Send a single prompt and receive a response directly in your terminal. For streaming providers, responses appear in real-time as they're generated. For non-streaming providers, a spinner animation indicates progress.
 
 ```bash
 # Using the default provider
 devint chat "Tell me about the governmental structure of China."
 
 # Override the provider
-devint chat -p thaura "Tell me about the history of the PFLP in the 1960s."
+devint chat -p thaura "Tell me about the history of Brazilian music."
 
 # Override the model
 devint chat -m deepseek-reasoner "Help me build a complex system of philosophical development based on Marxist theory."
 ```
-
-**Features:**
-- 🚀 **Real-time Streaming**: See responses appear as they're generated (for supported providers)
-- 🎯 **Clean Output**: Only the response text is displayed, no logs
-- ⏳ **Progress Indicator**: Animated spinner for non-streaming providers
-- 🎨 **Formatted Output**: Markdown formatting is preserved in the response
 
 ## Interactive Mode
 
@@ -172,24 +167,7 @@ Start an interactive chat session with a beautiful terminal UI that preserves co
 devint chat
 ```
 
-**Features:**
-- 💬 **Contextual Conversations**: Full conversation history maintained throughout the session
-- 🎨 **Beautiful UI**: Three-panel layout with header, scrollable chat history, and input field
-- 🌊 **Real-time Streaming**: Watch responses appear word-by-word in real-time
-- ✨ **Markdown Rendering**: Bold text, headings, and formatting displayed beautifully
-- ⚡ **Live Indicators**: Animated spinners show when the AI is processing
-- 📜 **Scrollable History**: Mouse and keyboard scrolling through conversation history
-- ⌨️ **Rich Input**: Multi-line text input with cursor navigation
-- 🎯 **Provider Display**: See which provider and model you're using at a glance
-- 🛑 **Easy Exit**: Press `Ctrl+C` to exit anytime
-
-The interactive mode features:
-- **Header Panel**: Displays the active provider (with emoji 🍉 for Thaura, 🤖 for DeepSeek, 🌐 for OpenRouter) and model
-- **Chat History Panel**: Scrollable conversation view with color-coded messages (green for you, blue for the assistant)
-- **Status Panel**: Shows animated loading indicator when waiting for responses
-- **Input Panel**: Clean text input area that becomes disabled during AI processing
-
-# Usage
+# Commands Usage
 
 The Developer Interface (`devint`) enables streamlined development workflows by providing a unified command-line interface to manage configuration settings, execute Git operations, and interact with AI models. Below are tables of available commands and their flags:
 
@@ -239,11 +217,11 @@ This command fetches a pull request by number, retrieves its diff, and saves a f
 
 To run the interactive editor, run without any flags, ie. `devint config`.
 
-<!-- GIF: devint config interactive editor -->
-<div align="center">
+<!-- TODO: add GIF showing devint config interactive editor once UI is updated to use `github.com/rivo/tview` -->
+<!-- <div align="center">
   <img src=".github/img/config-interactive.gif" alt="devint config interactive mode" width="800"/>
   <p><i>Interactive configuration editor</i></p>
-</div>
+</div> -->
 
 # Configuration
 
@@ -269,7 +247,11 @@ llm_config:
     thaura:
       api_key: "your-thaura-api-key"
       client_model: "thaura"
+```
+
 # TODOs
+
+*Devleopment notes to improve the Developer Interface:*
 
 - [ ] Update interactive Config interface to use `github.com/rivo/tview`
 - [ ] Update interactive Config interface to log out OpenRouter models
