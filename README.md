@@ -1,17 +1,34 @@
-<div align="center">
+<table align="center">
+<tr>
+<td align="center">
 
-```
- ____  _______     _____ _   _ _____ 
-|  _ \| ____\ \   / /_ _| \ | |_   _|
-| | | |  _|  \ \ / / | ||  \| | | |  
-| |_| | |___  \ V /  | || |\  | | |  
-|____/|_____|  \_/  |___|_| \_| |_|  
-                                      
-  💻 Developer Interface
-```
+<pre>
+╔═════════════════════════════════════════════════════╗
+║                                                     ║
+║   ██████╗ ███████╗██╗   ██╗██╗███╗   ██╗████████╗   ║
+║   ██╔══██╗██╔════╝██║   ██║██║████╗  ██║╚══██╔══╝   ║
+║   ██║  ██║█████╗  ██║   ██║██║██╔██╗ ██║   ██║      ║
+║   ██║  ██║██╔══╝  ╚██╗ ██╔╝██║██║╚██╗██║   ██║      ║
+║   ██████╔╝███████╗ ╚████╔╝ ██║██║ ╚████║   ██║      ║
+║   ╚═════╝ ╚══════╝  ╚═══╝  ╚═╝╚═╝  ╚═══╝   ╚═╝      ║
+║                                                     ║
+╚═════════════════════════════════════════════════════╝
 
-</div>
+💻 Developer Interface
+
+Developer toolkit powered by multi-provider LLM integration.
+</pre>
+
+</td>
+</tr>
+</table>
 <br/>
+
+<!-- GIF: devint chat introduction -->
+<div align="center">
+  <img src=".github/img/chat-introduction.gif" alt="devint chat introduction" width="1200"/>
+  <p><i>Introduction to the Developer Interface</i></p>
+</div>
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -237,7 +254,6 @@ An example configuration file can be found at `config/examples/.config.example.y
 Configuration can be updated using the interactive command `devint config`.
 
 ```yaml
-# yaml-language-server: $schema=../config.schema.yaml
 git_config:
   personal_access_token: github_pat_1a2b3c4d5e6f7g8h9i0j1a2b3c4d5e6f7g8h9i0j
   repo_owner: your-github-org-or-username
@@ -253,13 +269,8 @@ llm_config:
     thaura:
       api_key: "your-thaura-api-key"
       client_model: "thaura"
-```
-<<<<<<< HEAD
-
 # TODOs
 
 - [ ] Update interactive Config interface to use `github.com/rivo/tview`
 - [ ] Update interactive Config interface to log out OpenRouter models
 - [ ] Add comprehensive table-driven tests for all packages
-=======
->>>>>>> 48f77ac999d694e1c734d13f01069b9e36420383
