@@ -10,7 +10,7 @@
 - [Providers](#providers)
 - [Thaura](#thaura)
 - [DeepSeek](#deepseek)
-- [OpenRouter 🌐](#openrouter-)
+- [OpenRouter](#openrouter-)
 - [Interactive Chat](#interactive-chat)
   - [One-Shot Mode](#one-shot-mode)
   - [Interactive Mode](#interactive-mode)
