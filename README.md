@@ -144,13 +144,13 @@ Send a single prompt and receive a response directly in your terminal. For strea
 
 ```bash
 # Using the default provider
-devint chat "Tell me about the governmental structure of China."
+devint chat "Who is Captain Ibrahim Traore?"
 
 # Override the provider
 devint chat -p thaura "Tell me about the history of Brazilian music."
 
 # Override the model
-devint chat -m deepseek-reasoner "Help me build a complex system of philosophical development based on Marxist theory."
+devint chat -p deepseek -m deepseek-reasoner "Help me build a complex system of philosophical development based on Marxist theory."
 ```
 
 ## Interactive Mode
