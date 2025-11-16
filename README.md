@@ -26,12 +26,11 @@
 - [Configuration](#configuration)
 - [TODOs](#todos)
 
-
 ## Overview
 
-The Developer Interface (DI) is a command-line tool designed to streamline developer workflows. DI helps developers quickly perform routine operations and maintain consistency across projects.
+The Developer Interface (`devint`) is a command-line tool designed to streamline developer workflows. `devint` helps developers quickly perform routine operations and maintain consistency across projects.
 
-DI integrates with multiple Language Model (LLM) providers to power intelligent features like automated PR creation, code summarization, and more. The tool provides a unified interface for interacting with various LLM providers, making it easy to switch between different models and services.
+`devint` integrates with multiple Language Model (LLM) providers to power intelligent features like automated PR creation, code summarization, and more. The tool provides a unified interface for interacting with various LLM providers, making it easy to switch between different models and services.
 
 Key features include:
 - 🤖 **Multi-Provider LLM Support**: Seamlessly switch between Thaura, DeepSeek, and OpenRouter
@@ -41,7 +40,7 @@ Key features include:
 
 # Providers
 
-DI supports multiple LLM providers, each offering unique capabilities and models. You can configure one or more providers and switch between them as needed.
+`devint` supports multiple LLM providers, each offering unique capabilities and models. You can configure one or more providers and switch between them as needed.
 
 | Provider         | Website                                | Description                                         | Models                                                                      |
 | ---------------- | -------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -70,11 +69,11 @@ For API documentation, see [thaura.ai/api-platform](https://thaura.ai/api-platfo
 
 
 > ## 🇵🇸 Tech for Palestine <!-- omit in toc -->
-> [Tech for Palestine](https://techforpalestine.org/) (T4P) is a coalition of thousands of founders, engineers, product marketers, investors, and other professionals working in support of Palestinian liberation.
+> [Tech for Palestine](https://techforpalestine.org/) (T4P) is a coalition of founders, engineers, product marketers, investors, and other professionals working in support of Palestinian liberation.
 >
 >**What is Tech for Palestine?**
 >
->Tech for Palestine is first and foremost an incubator for advocacy projects. They rally thousands of volunteers from across the tech world — founders, engineers, marketers, investors, and more — all committed to Palestinian liberation.
+>Tech for Palestine is first and foremost an incubator for advocacy projects. They rally volunteers from across the tech world — founders, engineers, marketers, investors, and more — all committed to Palestinian liberation.
 >
 >The T4P Incubator helps pro-Palestine advocates build, grow, and scale their work towards a Free Palestine. They support projects — whether collections of individuals, registered non-profits, or even companies — whose mission helps Palestine, especially advocacy groups building technical products or in the tech space.
 >
@@ -175,7 +174,7 @@ The interactive mode features:
 
 # Usage
 
-The Developer Interface (DI) enables streamlined development workflows by providing a unified command-line interface to manage configuration settings, execute Git operations, and interact with AI models. Below are tables of available commands and their flags:
+The Developer Interface (`devint`) enables streamlined development workflows by providing a unified command-line interface to manage configuration settings, execute Git operations, and interact with AI models. Below are tables of available commands and their flags:
 
 ### devint <!-- omit in toc -->
 
@@ -255,9 +254,12 @@ llm_config:
       api_key: "your-thaura-api-key"
       client_model: "thaura"
 ```
+<<<<<<< HEAD
 
 # TODOs
 
 - [ ] Update interactive Config interface to use `github.com/rivo/tview`
 - [ ] Update interactive Config interface to log out OpenRouter models
 - [ ] Add comprehensive table-driven tests for all packages
+=======
+>>>>>>> 48f77ac999d694e1c734d13f01069b9e36420383
