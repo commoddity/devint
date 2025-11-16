@@ -37,6 +37,16 @@ type LLMProvider interface {
 	SendPrompt(ctx context.Context, prompt string, flags ...PromptFlag) (string, error)
 }
 
+// StreamingLLMProvider is an optional interface that providers can implement to support
+// streaming responses. The onChunk callback is called for each chunk of text received.
+// If the provider supports streaming, it should implement this interface.
+type StreamingLLMProvider interface {
+	LLMProvider
+	// StreamPrompt sends the given prompt and streams the response by calling onChunk
+	// for each piece of text received. Returns an error if streaming fails.
+	StreamPrompt(ctx context.Context, prompt string, onChunk func(chunk string) error, flags ...PromptFlag) error
+}
+
 // PromptConfig holds configuration details for an LLM prompt.
 // The Model field specifies which LLM model should be used to process the prompt.
 type PromptConfig struct {

@@ -158,7 +158,7 @@ func runInteractiveMode(llmProvider llm.LLMProvider, logger *slog.Logger, cfg *c
 
 	switch providerName {
 	case "thaura":
-		providerEmoji = "🍉" // Watermelon emoji - symbol of Palestinian solidarity
+		providerEmoji = "🍉"
 		if chatModelOverride != "" {
 			modelName = chatModelOverride
 		} else if cfg.LLMs.LLMProviders.Thaura != nil {
@@ -196,9 +196,10 @@ func runInteractiveMode(llmProvider llm.LLMProvider, logger *slog.Logger, cfg *c
 	fmt.Printf("%sPress Ctrl+C to exit at any time.%s\n", log.White, log.ResetColor)
 	fmt.Println()
 
-	// Create readline instance with custom prompt
+	// Create readline instance with a simple text prompt
+	// Using plain text to avoid width calculation issues with ANSI codes
 	rl, err := readline.NewEx(&readline.Config{
-		Prompt:              fmt.Sprintf("%s└─▶%s ", log.Green, log.ResetColor),
+		Prompt:              "\n● You: ",
 		HistoryFile:         "/tmp/devint-chat-history.tmp",
 		InterruptPrompt:     "^C",
 		EOFPrompt:           "exit",
@@ -220,10 +221,7 @@ func runInteractiveMode(llmProvider llm.LLMProvider, logger *slog.Logger, cfg *c
 	}()
 
 	for {
-		// Show the [You] header before each prompt
-		fmt.Printf("%s┌─[You]%s\n", log.Green, log.ResetColor)
-
-		// Read line with full terminal support
+		// Read line with full terminal support (prompt is set in readline config)
 		line, err := rl.Readline()
 		if err != nil {
 			if err == readline.ErrInterrupt || err == io.EOF {
@@ -248,40 +246,68 @@ func runInteractiveMode(llmProvider llm.LLMProvider, logger *slog.Logger, cfg *c
 		// Build the full prompt with conversation context
 		fullPrompt := buildConversationPrompt(conversationHistory)
 
-		// Show animated thinking indicator with spinner
-		fmt.Println()
-		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-		s.Prefix = fmt.Sprintf("%s", log.Blue)
-		s.Suffix = fmt.Sprintf(" Thinking...%s", log.ResetColor)
-		s.Color("cyan", "bold")
-		s.Start()
-
 		// Get prompt flags based on any model override.
 		promptFlags := getChatPromptFlags()
 
-		// Send the prompt to the LLM provider.
-		response, err := llmProvider.SendPrompt(context.Background(), fullPrompt, promptFlags...)
+		// Determine current provider and model for display
+		currentProvider := providerName
+		currentModel := modelName
+		if chatModelOverride != "" {
+			currentModel = chatModelOverride
+		}
 
-		// Stop the spinner
-		s.Stop()
+		// Capitalize first letter of provider name
+		displayProvider := strings.ToUpper(currentProvider[:1]) + currentProvider[1:]
 
-		if err != nil {
-			fmt.Printf("%s❌ Error: %v%s\n\n", log.Red, err, log.ResetColor)
+		// Print the assistant response header with provider and model
+		fmt.Printf("\n%s●%s %s%s (%s):%s ", log.Blue, log.ResetColor, log.Bold, displayProvider, currentModel, log.ResetColor)
+
+		// Check if provider supports streaming
+		streamingProvider, supportsStreaming := llmProvider.(llm.StreamingLLMProvider)
+
+		var response strings.Builder
+		var streamErr error
+
+		if supportsStreaming {
+			// Use streaming mode - display text as it arrives
+			streamErr = streamingProvider.StreamPrompt(context.Background(), fullPrompt, func(chunk string) error {
+				// Print chunk immediately (stays on same line as arrow)
+				fmt.Print(chunk)
+				// Accumulate for history
+				response.WriteString(chunk)
+				return nil
+			}, promptFlags...)
+		} else {
+			// Fallback to non-streaming mode
+			// Show animated thinking indicator with spinner
+			s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+			s.Prefix = fmt.Sprintf("%s", log.Blue)
+			s.Suffix = fmt.Sprintf(" Thinking...%s", log.ResetColor)
+			s.Color("cyan", "bold")
+			s.Start()
+
+			// Send the prompt to the LLM provider.
+			responseText, sendErr := llmProvider.SendPrompt(context.Background(), fullPrompt, promptFlags...)
+
+			// Stop the spinner
+			s.Stop()
+
+			if sendErr != nil {
+				streamErr = sendErr
+			} else {
+				response.WriteString(responseText)
+				// Print response preserving formatting (paragraphs, lists, etc.)
+				printFormattedResponse(responseText)
+			}
+		}
+
+		if streamErr != nil {
+			fmt.Printf("\n%s❌ Error: %v%s\n", log.Red, streamErr, log.ResetColor)
 			continue
 		}
 
 		// Add assistant response to conversation history
-		conversationHistory = append(conversationHistory, fmt.Sprintf("Assistant: %s", response))
-
-		// Print the response with formatting
-		fmt.Println()
-		fmt.Printf("%s┌─[Assistant]%s\n", log.Blue, log.ResetColor)
-		fmt.Printf("%s└─▶%s\n", log.Blue, log.ResetColor)
-
-		// Print response preserving formatting (paragraphs, lists, etc.)
-		printFormattedResponse(response)
-		fmt.Println()
-		fmt.Println()
+		conversationHistory = append(conversationHistory, fmt.Sprintf("Assistant: %s", response.String()))
 	}
 }
 
