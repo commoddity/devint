@@ -93,7 +93,7 @@ For API documentation, see [thaura.ai/api-platform](https://thaura.ai/api-platfo
 - `deepseek-chat` - General-purpose chat model
 - `deepseek-reasoner` - Advanced reasoning model
 
-## OpenRouter 🌐
+## OpenRouter
 
 [OpenRouter](https://openrouter.ai) is a unified API that provides access to multiple AI models from various providers. It offers flexibility and choice, allowing you to use different models through a single interface.
 
