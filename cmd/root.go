@@ -97,6 +97,7 @@ func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Toggle verbose mode or other options")
 	rootCmd.AddCommand(git.GitCmd)
 	rootCmd.AddCommand(config.ConfigCmd)
+	rootCmd.AddCommand(chatCmd)
 
 	if !config.ConfigExists() {
 		config.RunFirstTimeSetup()

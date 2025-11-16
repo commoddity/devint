@@ -2,20 +2,15 @@
 git_config:
   personal_access_token: github_pat_1a2b3c4d5e6f7g8h9i0j1a2b3c4d5e6f7g8h9i0j
   repo_owner: your-github-org-or-username
-  # pr_summary_output_dir: /path/to/output/directory  # Optional: directory where PR summaries will be saved
-  # company_name: yourcompany  # Optional: company name to filter from diffs (matched case-insensitively)
 llm_config:
-  default_llm_provider: openai
+  default_llm_provider: deepseek
   llm_providers:
-    openai:
-      api_key: "your-openai-api-key"
-      client_model: "gpt-4o"
     deepseek:
       api_key: "your-deepseek-api-key"
       client_model: "deepseek-chat"
-    anthropic:
-      api_key: "your-anthropic-api-key"
-      client_model: "claude-3-5-haiku-latest"
     openrouter:
       api_key: "your-openrouter-api-key"
       client_model: "deepseek/deepseek-chat"
+    thaura:
+      api_key: "your-thaura-api-key"
+      client_model: "thaura"

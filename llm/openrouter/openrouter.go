@@ -45,7 +45,7 @@ func (p *OpenRouterProvider) SendPrompt(ctx context.Context, prompt string, flag
 
 	openrouterModel := OpenRouterModel(cfg.Model)
 	if !openrouterModel.IsValid() {
-		return "", fmt.Errorf("invalid OpenRouter model: %s.\nValid models:\n%s", cfg.Model, ListValidModelsStr())
+		return "", fmt.Errorf("invalid OpenRouter model: model string cannot be empty")
 	}
 
 	req := openrouter.ChatCompletionRequest{

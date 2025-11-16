@@ -51,10 +51,9 @@ func InitEmptyConfig() error {
 		Git: &git.Config{},
 		LLMs: &llm.Config{
 			LLMProviders: llm.ProvidersConfig{
-				OpenAI:     &llm.OpenAIConfig{},
 				DeepSeek:   &llm.DeepSeekConfig{},
-				Anthropic:  &llm.AnthropicConfig{},
 				OpenRouter: &llm.OpenRouterConfig{},
+				Thaura:     &llm.ThauraConfig{},
 			},
 		},
 	}

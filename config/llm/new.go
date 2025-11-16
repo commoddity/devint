@@ -5,10 +5,9 @@ import (
 	"log/slog"
 
 	"github.com/commoddity/devint/llm"
-	"github.com/commoddity/devint/llm/anthropic"
 	"github.com/commoddity/devint/llm/deepseek"
-	"github.com/commoddity/devint/llm/openai"
 	"github.com/commoddity/devint/llm/openrouter"
+	"github.com/commoddity/devint/llm/thaura"
 )
 
 // NewLLMProvider creates a new LLM provider based on the config.
@@ -26,13 +25,6 @@ func NewLLMProvider(logger *slog.Logger, llmConfig *Config, flags ...ProviderFla
 
 	switch provider {
 
-	case ProviderNameOpenAI:
-		return openai.NewOpenAIProvider(openai.Config{
-			Logger:      logger,
-			APIKey:      llmConfig.LLMProviders.OpenAI.APIKey,
-			ClientModel: llmConfig.LLMProviders.OpenAI.ClientModel,
-		}), nil
-
 	case ProviderNameDeepSeek:
 		return deepseek.NewDeepseekProvider(deepseek.Config{
 			Logger:      logger,
@@ -40,18 +32,18 @@ func NewLLMProvider(logger *slog.Logger, llmConfig *Config, flags ...ProviderFla
 			ClientModel: llmConfig.LLMProviders.DeepSeek.ClientModel,
 		}), nil
 
-	case ProviderNameAnthropic:
-		return anthropic.NewAnthropicProvider(anthropic.Config{
-			Logger:      logger,
-			APIKey:      llmConfig.LLMProviders.Anthropic.APIKey,
-			ClientModel: llmConfig.LLMProviders.Anthropic.ClientModel,
-		}), nil
-
 	case ProviderNameOpenRouter:
 		return openrouter.NewOpenRouterProvider(openrouter.Config{
 			Logger:      logger,
 			APIKey:      llmConfig.LLMProviders.OpenRouter.APIKey,
 			ClientModel: llmConfig.LLMProviders.OpenRouter.ClientModel,
+		}), nil
+
+	case ProviderNameThaura:
+		return thaura.NewThauraProvider(thaura.Config{
+			Logger:      logger,
+			APIKey:      llmConfig.LLMProviders.Thaura.APIKey,
+			ClientModel: llmConfig.LLMProviders.Thaura.ClientModel,
 		}), nil
 
 	default:

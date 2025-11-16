@@ -10,4 +10,5 @@ const (
 	Yellow     = "\033[33m" // For save option (always printed as 's').
 	Red        = "\033[31m" // For error messages.
 	Cyan       = "\033[36m" // Used for the full "Enter choice" prompt.
+	Bold       = "\033[1m"  // For bold text formatting.
 )

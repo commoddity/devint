@@ -38,39 +38,18 @@ properties:
         description: "The default LLM provider to use. This may be overriden per-request using the `-p|--provider` flag."
         type: string
         enum:
-          - "openai"
           - "deepseek"
-          - "anthropic"
           - "openrouter"
+          - "thaura"
       llm_providers:
         description: "LLM providers configuration. This is used to configure your LLM providers."
         type: object
         anyOf:
-          - required: ["openai"]
           - required: ["deepseek"]
-          - required: ["anthropic"]
           - required: ["openrouter"]
+          - required: ["thaura"]
         additionalProperties: false
         properties:
-          openai:
-            description: "OpenAI configuration."
-            type: object
-            required:
-              - api_key
-              - client_model
-            additionalProperties: false
-            properties:
-              api_key:
-                description: "API key for OpenAI."
-                type: string
-              client_model:
-                description: "Client model for OpenAI. This may be overriden per-request using the `-m|--model` flag."
-                type: string
-                enum:
-                  - "o1-mini"
-                  - "o1"
-                  - "o3-mini"
-                  - "gpt-4o"
           deepseek:
             description: "DeepSeek configuration."
             type: object
@@ -88,24 +67,6 @@ properties:
                 enum:
                   - "deepseek-chat"
                   - "deepseek-reasoner"
-          anthropic:
-            description: "Anthropic configuration."
-            type: object
-            required:
-              - api_key
-              - client_model
-            additionalProperties: false
-            properties:
-              api_key:
-                description: "API key for Anthropic."
-                type: string
-              client_model:
-                description: "Client model for Anthropic. This may be overriden per-request using the `-m|--model` flag."
-                type: string
-                enum:
-                  - "claude-3-5-haiku-latest"
-                  - "claude-3-5-sonnet-latest"
-                  - "claude-3-opus-20240229"
           openrouter:
             description: "OpenRouter configuration."
             type: object
@@ -118,16 +79,21 @@ properties:
                 description: "API key for OpenRouter."
                 type: string
               client_model:
-                description: "Client model for OpenRouter. This may be overriden per-request using the `-m|--model` flag."
+                description: "Client model for OpenRouter. This may be overriden per-request using the `-m|--model` flag. Any model string is valid. See https://openrouter.ai/models for available models."
+                type: string
+          thaura:
+            description: "Thaura configuration."
+            type: object
+            required:
+              - api_key
+              - client_model
+            additionalProperties: false
+            properties:
+              api_key:
+                description: "API key for Thaura."
+                type: string
+              client_model:
+                description: "Client model for Thaura. This may be overriden per-request using the `-m|--model` flag."
                 type: string
                 enum:
-                  - "deepseek/deepseek-chat-v3-0324"
-                  - "deepseek/deepseek-chat"
-                  - "deepseek/deepseek-r1"
-                  - "perplexity/r1-1776"
-                  - "openai/chatgpt-4o-latest"
-                  - "openai/o1"
-                  - "anthropic/claude-3.7-sonnet"
-                  - "anthropic/claude-3.5-haiku"
-                  - "anthropic/claude-3-opus"
-                  - "qwen/qwen-turbo"
+                  - "thaura"
