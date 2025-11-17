@@ -144,7 +144,7 @@ See [openrouter.ai/models](https://openrouter.ai/models) for the full list of av
 
 # 💬 Interactive Chat
 
-The `devint chat` command provides a powerful interface for interacting with your configured LLM provider. It supports two modes of operation:
+The `devint chat` command supports two modes of operation:
 
 ## ⚡ One-Shot Mode
 
