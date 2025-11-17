@@ -32,6 +32,8 @@ Developer toolkit powered by multi-provider LLM integration.
 
 ## Table of Contents <!-- omit in toc -->
 
+- [🚀 Quickstart](#-quickstart)
+- [📖 Overview](#-overview)
 - [⚗️ Providers](#️-providers)
   - [🇵🇸 Thaura](#-thaura)
   - [🐋 DeepSeek](#-deepseek)
@@ -43,7 +45,66 @@ Developer toolkit powered by multi-provider LLM integration.
 - [⚙️ Configuration](#️-configuration)
 - [📝 TODOs](#-todos)
 
-## Overview
+# 🚀 Quickstart
+
+## Dependencies <!-- omit in toc -->
+
+- [Go](https://go.dev/dl/) (version 1.21 or later)
+
+## Installation <!-- omit in toc -->
+
+Install `devint` using Go's install command:
+
+```bash
+go install github.com/commoddity/devint@latest
+```
+
+To verify the installation:
+```bash
+devint --version
+```
+
+## First-Time Setup <!-- omit in toc -->
+
+When you run `devint` for the first time, it will automatically launch an interactive setup prompt that guides you through configuration.
+
+<details>
+<summary><b>Click to see the values the setup wizard will ask you to configure</b></summary>
+<br/>
+
+1. **Git Configuration** (required):
+   - GitHub Personal Access Token (PAT) with at least `write:repo` scope
+   - GitHub repository owner (organization or username)
+   - Optional: PR summary output directory
+   - Optional: Company name to filter from diffs
+
+2. **LLM Provider Configuration** (required):
+   - Default LLM provider (choose from DeepSeek, OpenRouter, or Thaura)
+   - API key for your chosen provider
+   - Default model for your provider
+   - Optionally configure additional providers
+</details>
+<br/>
+
+Simply run any `devint` command to trigger the first-time setup:
+
+```bash
+devint chat
+```
+
+The wizard will guide you through each step with clear prompts and helpful descriptions.
+
+## Running Your First Command <!-- omit in toc -->
+
+Once setup is complete, try a one-shot query:
+
+```bash
+devint chat "Can you explain Manifest Destiny in simple terms?"
+```
+
+That's it! You're ready to use the Developer Interface. 🎉
+
+# 📖 Overview
 
 The Developer Interface (`devint`) is a command-line tool designed to streamline developer workflows. `devint` helps developers quickly perform routine operations and maintain consistency across projects.
 

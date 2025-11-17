@@ -120,6 +120,16 @@ func RunFirstTimeSetup() error {
 		gitConfigNode.Content = cfgEditor.SetScalarValue(gitConfigNode.Content, "pr_summary_output_dir", prSummaryDir)
 	}
 
+	// Configure company_name (optional)
+	fmt.Print(log.Green + "🏢 Optionally, enter your company/organization name to filter from diffs sent to LLMs. (Leave empty to skip)" + log.ResetColor + "\n")
+	fmt.Print(log.Blue + "📝 Enter company name (optional, press Enter to skip): " + log.ResetColor)
+	companyName, _ := reader.ReadString('\n')
+	companyName = strings.TrimSpace(companyName)
+	cfgEditor.ClearTerminal()
+	if companyName != "" {
+		gitConfigNode.Content = cfgEditor.SetScalarValue(gitConfigNode.Content, "company_name", companyName)
+	}
+
 	llmConfigNode := cfgEditor.GetOrCreateMappingNode(configNode, "llm_config")
 	allowedProviders := yamlEditor.GetEnumOptionsForPath("llm_config.default_llm_provider")
 	if len(allowedProviders) == 0 {
