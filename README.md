@@ -205,7 +205,7 @@ See [openrouter.ai/models](https://openrouter.ai/models) for the full list of av
 
 # 💬 Interactive Chat
 
-The `devint chat` command provides a powerful interface for interacting with your configured LLM provider. It supports two modes of operation:
+The `devint chat` command supports two modes of operation:
 
 ## ⚡ One-Shot Mode
 
@@ -215,7 +215,7 @@ The `devint chat` command provides a powerful interface for interacting with you
   <p><i>One-shot mode with streaming response</i></p>
 </div>
 
-Send a single prompt and receive a response directly in your terminal. For streaming providers, responses appear in real-time as they're generated. For non-streaming providers, a spinner animation indicates progress.
+Send a single prompt and receive a response directly in your terminal.
 
 ```bash
 # Using the default provider
@@ -236,7 +236,7 @@ devint chat -p deepseek -m deepseek-reasoner "Help me build a complex system of 
   <p><i>Interactive mode with streaming responses and full conversation context</i></p>
 </div>
 
-Start an interactive chat session with a beautiful terminal UI that preserves conversation context throughout the session:
+Start an interactive chat session in a terminal UI that preserves conversation context throughout the session:
 
 ```bash
 devint chat
