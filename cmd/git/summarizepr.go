@@ -14,6 +14,9 @@ import (
 	"github.com/commoddity/devint/config"
 	llmCfg "github.com/commoddity/devint/config/llm"
 	gitPkg "github.com/commoddity/devint/git"
+	"github.com/commoddity/devint/llm"
+	"github.com/commoddity/devint/llm/deepseek"
+	"github.com/commoddity/devint/llm/thaura"
 	"github.com/commoddity/devint/log"
 )
 
@@ -125,6 +128,43 @@ Flags:
 		llmSummary, err := llmProvider.SendPrompt(context.Background(), sanitizedPrompt, promptFlags...)
 		if err != nil {
 			stdlog.Fatalf("failed to generate summary from LLM: %v", err)
+		}
+
+		// Calculate and display cost if provider supports usage tracking
+		if usageProvider, ok := llmProvider.(llm.UsageTrackingProvider); ok {
+			usage, err := usageProvider.GetLastUsage()
+			if err == nil {
+				model := usageProvider.GetLastModel()
+				var cost float64
+				var costErr error
+
+				// Calculate cost based on provider type
+				providerName := string(cfg.LLMs.DefaultLLMProvider)
+				if llmProviderOverride != "" {
+					providerName = llmProviderOverride
+				}
+
+				switch providerName {
+				case "thaura":
+					thauraModel := thaura.ThauraModel(model)
+					cost, costErr = thaura.CalculateCost(thauraModel, usage)
+				case "deepseek":
+					deepseekModel := deepseek.DeepSeekModel(model)
+					// Try to get cache hit tokens if available
+					cacheHitTokens := 0
+					if deepseekProvider, ok := llmProvider.(*deepseek.DeepseekProvider); ok {
+						cacheHitTokens = deepseekProvider.GetLastCacheHitTokens()
+					}
+					cost, costErr = deepseek.CalculateCost(deepseekModel, usage, cacheHitTokens)
+				}
+
+				if costErr == nil && cost > 0 {
+					logger.Info("💰 Cost calculated",
+						"cost", cost,
+						"usage", usage,
+						"model", model)
+				}
+			}
 		}
 
 		// Build the markdown summary with LLM-generated explanation.

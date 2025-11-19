@@ -10,6 +10,8 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/commoddity/devint/llm"
+	"github.com/commoddity/devint/llm/deepseek"
+	"github.com/commoddity/devint/llm/thaura"
 )
 
 // HandleResponse orchestrates sending a prompt to the LLM and displaying the response.
@@ -110,6 +112,9 @@ func (ui *ChatUI) streamToView(ctx context.Context, provider llm.StreamingLLMPro
 	// Small delay to ensure animations stop cleanly
 	time.Sleep(100 * time.Millisecond)
 
+	// Calculate and update cost if provider supports usage tracking
+	ui.calculateAndUpdateCost()
+
 	// Clear processing state and re-enable input
 	ui.isProcessing = false
 	ui.app.QueueUpdateDraw(func() {
@@ -134,29 +139,25 @@ func (ui *ChatUI) animateHeaderLoading(stop chan bool) {
 	ticker := time.NewTicker(80 * time.Millisecond)
 	defer ticker.Stop()
 
-	// Store original header text
+	// Get provider info for header
 	providerName, modelName := ui.GetProviderInfo()
-	originalHeader := fmt.Sprintf(
-		"[cyan::b]🤖 Interactive Chat Mode - LLM Assistant[-::-]\n"+
-			"[yellow]💡 Provider:[-] %s [cyan::b]%s[-::-]  [yellow]🔧 Model:[-] [green::b]%s[-::-]",
-		ui.providerEmoji, providerName, modelName)
 
 	for {
 		select {
 		case <-stop:
-			// Restore original header
+			// Restore original header (will be updated with new cost after response)
 			ui.app.QueueUpdateDraw(func() {
-				ui.headerView.SetText(originalHeader)
+				ui.UpdateHeaderCost()
 			})
 			return
 		case <-ticker.C:
 			frame := frames[frameIdx]
 			ui.app.QueueUpdateDraw(func() {
-				// Update header with loading indicator
+				// Update header with loading indicator, preserving session cost
 				headerWithLoading := fmt.Sprintf(
 					"[cyan::b]🤖 Interactive Chat Mode - LLM Assistant[-::-] [cyan]%s[-]\n"+
-						"[yellow]💡 Provider:[-] %s [cyan::b]%s[-::-]  [yellow]🔧 Model:[-] [green::b]%s[-::-]",
-					frame, ui.providerEmoji, providerName, modelName)
+						"[yellow]💡 Provider:[-] %s [cyan::b]%s[-::-]  [yellow]🔧 Model:[-] [green::b]%s[-::-]  [yellow]💰 Session Cost:[-] [green::b]$%.4f[-::-]",
+					frame, ui.providerEmoji, providerName, modelName, ui.sessionTotalCost)
 				ui.headerView.SetText(headerWithLoading)
 			})
 			frameIdx = (frameIdx + 1) % len(frames)
@@ -259,5 +260,43 @@ func (ui *ChatUI) nonStreamingResponse(ctx context.Context, prompt string, flags
 	formattedResponse := ConvertMarkdownToTview(res.text)
 	fmt.Fprint(ui.chatView, formattedResponse)
 
+	// Calculate and update cost if provider supports usage tracking
+	ui.calculateAndUpdateCost()
+
 	return res.text, nil
+}
+
+// calculateAndUpdateCost calculates the cost for the last prompt and updates the session total.
+func (ui *ChatUI) calculateAndUpdateCost() {
+	if usageProvider, ok := ui.llmProvider.(llm.UsageTrackingProvider); ok {
+		usage, err := usageProvider.GetLastUsage()
+		if err == nil {
+			model := usageProvider.GetLastModel()
+			var cost float64
+			var costErr error
+
+			// Calculate cost based on provider type
+			switch ui.providerName {
+			case "thaura":
+				thauraModel := thaura.ThauraModel(model)
+				cost, costErr = thaura.CalculateCost(thauraModel, usage)
+			case "deepseek":
+				deepseekModel := deepseek.DeepSeekModel(model)
+				// Try to get cache hit tokens if available
+				cacheHitTokens := 0
+				if deepseekProvider, ok := ui.llmProvider.(*deepseek.DeepseekProvider); ok {
+					cacheHitTokens = deepseekProvider.GetLastCacheHitTokens()
+				}
+				cost, costErr = deepseek.CalculateCost(deepseekModel, usage, cacheHitTokens)
+			}
+
+			if costErr == nil && cost > 0 {
+				ui.sessionTotalCost += cost
+				// Update header with new session total
+				ui.app.QueueUpdateDraw(func() {
+					ui.UpdateHeaderCost()
+				})
+			}
+		}
+	}
 }

@@ -38,6 +38,7 @@ Developer toolkit powered by multi-provider LLM integration.
   - [🇵🇸 Thaura](#-thaura)
   - [🐋 DeepSeek](#-deepseek)
   - [🌍 OpenRouter](#-openrouter)
+- [💰 Cost Tracking](#-cost-tracking)
 - [💬 Interactive Chat](#-interactive-chat)
   - [⚡ One-Shot Mode](#-one-shot-mode)
   - [💭 Interactive Mode](#-interactive-mode)
@@ -203,6 +204,12 @@ OpenRouter accepts any model string. You can use any model available on OpenRout
 
 See [openrouter.ai/models](https://openrouter.ai/models) for the full list of available models.
 
+# 💰 Cost Tracking
+
+The Developer Interface automatically tracks and displays the cost of LLM API usage for supported providers. Cost tracking is available for:
+
+Costs are calculated based on token usage (input and output tokens) and displayed with 4 decimal places (1/100th of a cent precision). Pricing is model-specific and stored per provider, ensuring accurate cost calculations.
+
 # 💬 Interactive Chat
 
 The `devint chat` command supports two modes of operation:
@@ -343,6 +350,7 @@ llm_config:
 - [ ] Update interactive Config interface to use `github.com/rivo/tview`
 - [ ] Update interactive Config interface to log out OpenRouter models
 - [ ] Add comprehensive table-driven tests for all packages
+- [ ] Implement cost tracking for OpenRouter (requires per-model pricing lookup from OpenRouter API or pricing data source)
 
 ## 🧠 Additional GitHub Automation Ideas <!-- omit in toc -->
 

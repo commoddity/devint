@@ -19,6 +19,8 @@ import (
 	"github.com/commoddity/devint/config"
 	llmCfg "github.com/commoddity/devint/config/llm"
 	"github.com/commoddity/devint/llm"
+	"github.com/commoddity/devint/llm/deepseek"
+	"github.com/commoddity/devint/llm/thaura"
 )
 
 // LLM config flags
@@ -174,6 +176,9 @@ func runOneShotMode(llmProvider llm.LLMProvider, cfg *config.Config, prompt stri
 			stdlog.Fatalf("❌ Error: %v", err)
 		}
 		fmt.Println() // Add newline at the end
+
+		// Calculate and display cost if provider supports usage tracking
+		calculateAndDisplayCost(llmProvider, providerName, cfg)
 	} else {
 		// Non-streaming: show spinner while waiting
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
@@ -193,6 +198,40 @@ func runOneShotMode(llmProvider llm.LLMProvider, cfg *config.Config, prompt stri
 
 		// Print the response
 		fmt.Println(response)
+
+		// Calculate and display cost if provider supports usage tracking
+		calculateAndDisplayCost(llmProvider, providerName, cfg)
+	}
+}
+
+// calculateAndDisplayCost calculates and displays the cost for a prompt if the provider supports usage tracking.
+func calculateAndDisplayCost(llmProvider llm.LLMProvider, providerName string, cfg *config.Config) {
+	if usageProvider, ok := llmProvider.(llm.UsageTrackingProvider); ok {
+		usage, err := usageProvider.GetLastUsage()
+		if err == nil {
+			model := usageProvider.GetLastModel()
+			var cost float64
+			var costErr error
+
+			// Calculate cost based on provider type
+			switch providerName {
+			case "thaura":
+				thauraModel := thaura.ThauraModel(model)
+				cost, costErr = thaura.CalculateCost(thauraModel, usage)
+			case "deepseek":
+				deepseekModel := deepseek.DeepSeekModel(model)
+				// Try to get cache hit tokens if available
+				cacheHitTokens := 0
+				if deepseekProvider, ok := llmProvider.(*deepseek.DeepseekProvider); ok {
+					cacheHitTokens = deepseekProvider.GetLastCacheHitTokens()
+				}
+				cost, costErr = deepseek.CalculateCost(deepseekModel, usage, cacheHitTokens)
+			}
+
+			if costErr == nil && cost > 0 {
+				fmt.Printf("💰 Cost: $%.4f\n", cost)
+			}
+		}
 	}
 }
 

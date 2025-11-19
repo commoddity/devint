@@ -34,7 +34,8 @@ type ChatUI struct {
 	modelOverride string
 
 	// State
-	isProcessing bool
+	isProcessing   bool
+	sessionTotalCost float64 // Running total of costs for the session
 }
 
 // NewChatUI creates and initializes a new chat UI with all components.
@@ -95,8 +96,8 @@ func (ui *ChatUI) initializeComponents() {
 
 	headerText := fmt.Sprintf(
 		"[cyan::b]🤖 Interactive Chat Mode - LLM Assistant[-::-]\n"+
-			"[yellow]💡 Provider:[-] %s [cyan::b]%s[-::-]  [yellow]🔧 Model:[-] [green::b]%s[-::-]",
-		ui.providerEmoji, ui.providerName, ui.modelName)
+			"[yellow]💡 Provider:[-] %s [cyan::b]%s[-::-]  [yellow]🔧 Model:[-] [green::b]%s[-::-]  [yellow]💰 Session Cost:[-] [green::b]$%.4f[-::-]",
+		ui.providerEmoji, ui.providerName, ui.modelName, ui.sessionTotalCost)
 	ui.headerView.SetText(headerText)
 	ui.headerView.SetBorder(true).SetBorderPadding(0, 0, 1, 1)
 
@@ -165,4 +166,14 @@ func (ui *ChatUI) GetProviderInfo() (providerName, modelName string) {
 		return ui.providerName, ui.modelOverride
 	}
 	return ui.providerName, ui.modelName
+}
+
+// UpdateHeaderCost updates the header view with the current session total cost.
+func (ui *ChatUI) UpdateHeaderCost() {
+	providerName, modelName := ui.GetProviderInfo()
+	headerText := fmt.Sprintf(
+		"[cyan::b]🤖 Interactive Chat Mode - LLM Assistant[-::-]\n"+
+			"[yellow]💡 Provider:[-] %s [cyan::b]%s[-::-]  [yellow]🔧 Model:[-] [green::b]%s[-::-]  [yellow]💰 Session Cost:[-] [green::b]$%.4f[-::-]",
+		ui.providerEmoji, providerName, modelName, ui.sessionTotalCost)
+	ui.headerView.SetText(headerText)
 }

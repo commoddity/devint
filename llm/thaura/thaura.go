@@ -22,12 +22,17 @@ import (
 
 var _ llm.LLMProvider = &ThauraProvider{}
 var _ llm.StreamingLLMProvider = &ThauraProvider{}
+var _ llm.UsageTrackingProvider = &ThauraProvider{}
 
 type ThauraProvider struct {
 	logger      *slog.Logger
 	client      *http.Client
 	apiKey      string
 	clientModel ThauraModel
+
+	// Usage tracking
+	lastUsage llm.Usage
+	lastModel string
 }
 
 type Config struct {
@@ -57,6 +62,13 @@ type message struct {
 
 type chatCompletionResponse struct {
 	Choices []choice `json:"choices"`
+	Usage   usage    `json:"usage"`
+}
+
+type usage struct {
+	PromptTokens    int `json:"prompt_tokens"`
+	CompletionTokens int `json:"completion_tokens"`
+	TotalTokens     int `json:"total_tokens"`
 }
 
 type choice struct {
@@ -122,6 +134,14 @@ func (p *ThauraProvider) SendPrompt(ctx context.Context, prompt string, flags ..
 		return "", fmt.Errorf("no content returned from Thaura")
 	}
 
+	// Store usage and model for cost tracking
+	p.lastUsage = llm.Usage{
+		PromptTokens:    chatResp.Usage.PromptTokens,
+		CompletionTokens: chatResp.Usage.CompletionTokens,
+		TotalTokens:     chatResp.Usage.TotalTokens,
+	}
+	p.lastModel = string(thauraModel)
+
 	return chatResp.Choices[0].Message.Content, nil
 }
 
@@ -131,6 +151,7 @@ type streamChunk struct {
 			Content string `json:"content"`
 		} `json:"delta"`
 	} `json:"choices"`
+	Usage usage `json:"usage"`
 }
 
 func (p *ThauraProvider) StreamPrompt(ctx context.Context, prompt string, onChunk func(chunk string) error, flags ...llm.PromptFlag) error {
@@ -214,6 +235,16 @@ func (p *ThauraProvider) StreamPrompt(ctx context.Context, prompt string, onChun
 				continue
 			}
 
+			// Extract usage from final chunk (usage is typically in the last chunk before [DONE])
+			if chunk.Usage.TotalTokens > 0 {
+				p.lastUsage = llm.Usage{
+					PromptTokens:    chunk.Usage.PromptTokens,
+					CompletionTokens: chunk.Usage.CompletionTokens,
+					TotalTokens:     chunk.Usage.TotalTokens,
+				}
+				p.lastModel = string(thauraModel)
+			}
+
 			// Extract content from chunk
 			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
 				if err := onChunk(chunk.Choices[0].Delta.Content); err != nil {
@@ -228,4 +259,17 @@ func (p *ThauraProvider) StreamPrompt(ctx context.Context, prompt string, onChun
 	}
 
 	return nil
+}
+
+// GetLastUsage returns the usage information from the last prompt sent.
+func (p *ThauraProvider) GetLastUsage() (llm.Usage, error) {
+	if p.lastUsage.TotalTokens == 0 {
+		return llm.Usage{}, fmt.Errorf("no usage information available")
+	}
+	return p.lastUsage, nil
+}
+
+// GetLastModel returns the model identifier used for the last prompt.
+func (p *ThauraProvider) GetLastModel() string {
+	return p.lastModel
 }

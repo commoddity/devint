@@ -63,3 +63,23 @@ func WithLLMModelOverride(model string) PromptFlag {
 		cfg.Model = model
 	}
 }
+
+// Usage represents token usage information from an LLM response.
+type Usage struct {
+	PromptTokens    int // Number of tokens in the prompt
+	CompletionTokens int // Number of tokens in the completion
+	TotalTokens     int // Total number of tokens used
+}
+
+// UsageTrackingProvider is an optional interface that providers can implement to support
+// usage tracking and cost calculation. Providers that implement this interface can
+// report token usage and model information for cost tracking purposes.
+type UsageTrackingProvider interface {
+	LLMProvider
+	// GetLastUsage returns the usage information from the last prompt sent.
+	// Returns an error if usage information is not available.
+	GetLastUsage() (Usage, error)
+	// GetLastModel returns the model identifier used for the last prompt.
+	// Returns an empty string if the model is not available.
+	GetLastModel() string
+}

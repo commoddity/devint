@@ -12,6 +12,7 @@ import (
 
 var _ llm.LLMProvider = &OpenRouterProvider{}
 var _ llm.StreamingLLMProvider = &OpenRouterProvider{}
+var _ llm.UsageTrackingProvider = &OpenRouterProvider{}
 
 type OpenRouterProvider struct {
 	logger      *slog.Logger
@@ -127,4 +128,20 @@ func (p *OpenRouterProvider) StreamPrompt(ctx context.Context, prompt string, on
 	}
 
 	return nil
+}
+
+// GetLastUsage returns the usage information from the last prompt sent.
+// TODO: OpenRouter pricing calculation is complex due to per-model pricing.
+// Implement pricing lookup from OpenRouter API or pricing data source.
+// For now, returns zero usage to avoid breaking CLI commands.
+func (p *OpenRouterProvider) GetLastUsage() (llm.Usage, error) {
+	return llm.Usage{}, nil
+}
+
+// GetLastModel returns the model identifier used for the last prompt.
+// TODO: OpenRouter pricing calculation is complex due to per-model pricing.
+// Implement pricing lookup from OpenRouter API or pricing data source.
+// For now, returns empty string to avoid breaking CLI commands.
+func (p *OpenRouterProvider) GetLastModel() string {
+	return ""
 }
